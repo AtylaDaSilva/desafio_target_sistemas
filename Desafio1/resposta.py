@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 from typing import Any
+from pprint import pprint
+from decimal import Decimal, ROUND_DOWN
 from utils.functions import safe_cast
 
 
@@ -48,22 +50,52 @@ def ordenar_vendas_por_vendedor(vendas: list[dict[str, Any]]) -> dict[str, list[
     return vendas_por_vendedor
 
 
+def calcular_comissao_vendas(vendas: dict[str, list[dict]]):
+    comissao_vendas = {}
+    for vendedor, v in vendas.items():
+        # Venda é elegível para comissão se:
+        # • Vendas abaixo de R$100,00 não gera comissão
+        # • Vendas abaixo de R$500,00 gera 1% de comissão
+        # • A partir de R$500,00 gera 5% de comissão
+        comissao_vendas[vendedor] = {
+            "COMISSAO_TOTAL": 0,  # Evitar erro de null pointer
+            "COMISSAO_POR_VENDA": []
+        }
+        for valor in v:
+            valor = safe_cast(valor, float)
+            if valor < 100:
+                comissao = 0
+            elif valor < 500:
+                # Geralmente, o valor da comissão é parametrizado ou é definido em um banco de dados, mas para fins de simplicidade, vamos definir diretamente no código.
+                comissao = valor * 0.01
+            else:
+                comissao = valor * 0.05
+
+            # No enunciado da questão não foi especificado como tratar o arredondamento da comissão,
+            # então vamos arredondar para baixo.
+            comissao = float(Decimal(comissao).quantize(Decimal('0.01'), rounding=ROUND_DOWN))
+
+            comissao_vendas[vendedor]["COMISSAO_TOTAL"] += comissao
+            comissao_vendas[vendedor]["COMISSAO_POR_VENDA"].append(comissao)
+
+        # Arredondar o valor total da comissão para baixo fora do loop para evitar processamentos desnecessários.
+        comissao_vendas[vendedor]["COMISSAO_TOTAL"] = float(Decimal(comissao_vendas[vendedor]["COMISSAO_TOTAL"]).quantize(Decimal('0.01'), rounding=ROUND_DOWN))
+
+    return comissao_vendas
+
+
 # Resposta do desafio
 try:
     # Ler arquivo JSON com as vendas e salvar o campo "vendas" em uma lista
-
     vendas = ler_json_vendas('Desafio1/vendas.json')
-    vendas_ordenadas = ordenar_vendas_por_vendedor(vendas)
-    pass
-
 
     # Ordenar as vendas por vendedor (No exemplo já está ordenado, mas em casos reais pode não estar)
-    #   Criar dict "vendas", cada chave é o nome do vendedor e o valor é uma lista das vendas dele
+    vendas_ordenadas = ordenar_vendas_por_vendedor(vendas)
 
-    # Iterar sobre o dict "vendas" e calcular a comissão de cada vendedor
+    # Calcular comissão.
+    vendas_comissao = calcular_comissao_vendas(vendas_ordenadas)
 
-    # • Vendas abaixo de R$100,00 não gera comissão
-    # • Vendas abaixo de R$500,00 gera 1% de comissão
-    # • A partir de R$500,00 gera 5% de comissão
+    # Imprimir resultado final no console
+    pprint(vendas_comissao)
 except Exception as e:
     print("Não foi possível calcular as comissões. Erro:", str(e))

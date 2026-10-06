@@ -6,7 +6,7 @@
     "configurations": [
 
         {
-            "name": "Debugger: Desafio 1",
+            "name": "Desafio 1",
             "type": "debugpy",
             "request": "launch",
             "program": "${cwd}/Desafio1/resposta.py",
