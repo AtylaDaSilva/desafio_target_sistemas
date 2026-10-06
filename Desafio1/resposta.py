@@ -8,9 +8,19 @@ from utils.functions import safe_cast
 
 # Funções
 def ler_json_vendas(caminho_arquivo):
-    # with open(caminho_arquivo, 'r') as arquivo:
-    #     dados = json.load(arquivo)
-    #     return dados['vendas']
+    """Carrega as vendas de um arquivo JSON.
+
+    Args:
+        caminho_arquivo: Caminho do arquivo JSON que contém as vendas.
+
+    Returns:
+        Lista de vendas encontrada no campo `vendas` do arquivo JSON.
+
+    Raises:
+        FileNotFoundError: Se o arquivo não existir.
+        KeyError: Se o campo `vendas` não estiver presente no JSON.
+        json.JSONDecodeError: Se o conteúdo do arquivo não for um JSON válido.
+    """
     p = Path(caminho_arquivo)
 
     if not p.is_file():
@@ -24,6 +34,20 @@ def ler_json_vendas(caminho_arquivo):
     return json_vendas['vendas']
 
 def ordenar_vendas_por_vendedor(vendas: list[dict[str, Any]]) -> dict[str, list[dict]]:
+    """Agrupa os valores das vendas pelo nome normalizado do vendedor.
+
+    Args:
+        vendas: Lista de vendas, cada uma com os campos `vendedor` e `valor`.
+
+    Returns:
+        Dicionário que associa cada vendedor à lista de valores de suas vendas.
+
+    Raises:
+        KeyError: Se uma venda não contiver `vendedor` ou `valor`.
+        ValueError: Se o nome do vendedor estiver vazio ou o valor não for positivo.
+        TypeError: Se o tipo do valor da venda não puder ser convertido para número.
+        ValueError: Se o conteúdo do valor da venda não for numérico.
+    """
     vendas_por_vendedor = {}
     for venda in vendas:
         # Validar formato do dict
@@ -51,6 +75,23 @@ def ordenar_vendas_por_vendedor(vendas: list[dict[str, Any]]) -> dict[str, list[
 
 
 def calcular_comissao_vendas(vendas: dict[str, list[dict]]):
+    """Calcula as comissões de cada vendedor e de cada venda.
+
+    Vendas abaixo de R$ 100,00 não geram comissão; valores de R$ 100,00 a
+    R$ 499,99 geram 1%, e valores a partir de R$ 500,00 geram 5%. Os valores
+    são arredondados para baixo em duas casas decimais.
+
+    Args:
+        vendas: Dicionário que associa cada vendedor à lista de valores vendidos.
+
+    Returns:
+        Dicionário com a comissão total e a comissão individual de cada venda,
+        organizadas por vendedor.
+
+    Raises:
+        TypeError: Se o tipo de algum valor de venda não puder ser convertido para número.
+        ValueError: Se o conteúdo de algum valor de venda não for numérico.
+    """
     comissao_vendas = {}
     for vendedor, v in vendas.items():
         # Venda é elegível para comissão se:

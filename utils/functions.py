@@ -7,19 +7,18 @@ T = TypeVar('T')
 
 
 def safe_cast(value: Any, target_type: Type[T]) -> T:
-    """
-    Casts a value to the target type only if it's not already an instance of that type.
+    """Converte um valor para o tipo de destino, se necessário.
 
     Args:
-        value: The value to potentially cast.
-        target_type: The type to cast to.
+        value: Valor a ser convertido.
+        target_type: Tipo para o qual o valor deve ser convertido.
 
     Returns:
-        The value as the target type, either cast or unchanged.
+        Valor convertido para o tipo de destino ou inalterado se já for desse tipo.
 
     Raises:
-        TypeError: If the value cannot be cast to the target type.
-        ValueError: If the value is incompatible with the target type.
+        TypeError: Se o tipo de destino não puder ser aplicado ao valor.
+        ValueError: Se o valor for incompatível com o tipo de destino.
     """
     if isinstance(value, target_type):
         return value
