@@ -16,6 +16,16 @@
             }
         },
         {
+            "name": "Desafio 2",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${cwd}/Desafio2/resposta.py",
+            "console": "integratedTerminal",
+            "env": {
+                "pythonpath": "${workspaceFolder}"
+            }
+        },
+        {
             "name": "Desafio 3",
             "type": "debugpy",
             "request": "launch",

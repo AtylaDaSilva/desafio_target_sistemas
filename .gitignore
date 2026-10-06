@@ -182,3 +182,7 @@ cython_debug/
 
 # Libreoffice lock file
 .~lock.*
+
+# Arquivos do desafio
+**database.json
+**movimentacoes.json
